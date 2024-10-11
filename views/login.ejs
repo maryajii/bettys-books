@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <title><%=shopData.shopName%> Login</title>
+    <link rel="stylesheet"  type="text/css" href="/main.css" />
+  </head>
+  <body>
+    <h1>Login to <%=shopData.shopName%></h1>
+    <form method="POST" action="/users/loggedin">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        
+        <button type="submit">Login</button>
+    </form>
+  </body>
+</html>

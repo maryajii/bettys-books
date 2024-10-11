@@ -8,6 +8,10 @@ router.get('/register', function (req, res, next) {
     res.render('register.ejs')                                                               
 })    
 
+router.get('/login', function (req, res, next) {
+    res.render('login.ejs')                                                               
+})    
+
 router.post('/registered', function (req, res, next) {
     // saving data in database
     const plainPassword = req.body.password
@@ -30,7 +34,7 @@ router.post('/registered', function (req, res, next) {
             req.body.last,       
             req.body.email,      
             hashedPassword       
-        ];
+        ]
 
         db.query(sqlquery, values, function (error, results) {
             if (error) {
@@ -44,9 +48,48 @@ router.post('/registered', function (req, res, next) {
             result = 'Hello '+ req.body.first + ' '+ req.body.last +' you are now registered!  We will send an email to you at ' + req.body.email
             result += 'Your password is: '+ req.body.password +' and your hashed password is: '+ hashedPassword
             res.send(result)
-        }); 
-    }); 
-}); 
+        })
+    })
+}) 
+
+router.post('/loggedin', function (req, res, next) {
+    const username = req.body.username; // Get the username from the request
+    const plainPassword = req.body.password; // Get the password from the request
+
+    // SQL query to find the user by username
+    let sqlquery = `SELECT * FROM users WHERE username = ?`;
+    
+    db.query(sqlquery, [username], function (error, results) {
+        if (error) {
+            console.error(error); // Log any database errors
+            return res.status(500).send('Error querying the database.'); // Error response
+        }
+
+        // Check if user exists
+        if (results.length === 0) {
+            return res.status(401).send('Login failed: User does not exist.'); // User not found
+        }
+
+        // Get the hashed password from the database
+        const hashedPassword = results[0].hashed_password;
+        
+    bcrypt.compare(req.body.password, hashedPassword, function(err, result) {
+        if (err) {
+          // TODO: Handle error
+          console.error(err); // Log the error for debugging
+          return res.status(500).send('Error logging in user. Please try again.'); // Error response
+        }
+        else if (result == true) {
+          // TODO: Send message
+          return res.send('Login successful! Welcome, ' + username + '!');
+        }
+        else {
+          // TODO: Send message
+          return res.status(401).send('Login failed: Incorrect password.');
+        }
+      }) 
+    })     
+})
 
 router.get('/listusers', function(req, res, next) {
     let sqlquery = "SELECT * FROM users" // query database to get all the users
@@ -58,6 +101,7 @@ router.get('/listusers', function(req, res, next) {
         res.render("listusers.ejs", {availableUsers:result})
      })
 })
+
 
 // Export the router object so index.js can access it
 module.exports = router;
