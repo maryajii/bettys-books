@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to <%= shopData.shopName %></title>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+</head>
+<body>
+    <h1><%= shopData.shopName %> Shop</h1>
+    <h2>Here is a list of all our users:</h2>
+    
+    <% if (availableUsers && availableUsers.length > 0) { %>
+        <ul>
+            <% availableUsers.forEach(function(user) { %>
+                <li>Name: <%= user.first_name %> <%= user.last_name %> , Username: <%= user.username %></li>
+            <% }) %>
+        </ul>
+    <% } else { %>
+        <p>No users found.</p>
+    <% } %>
+    
+</body>
+</html>
