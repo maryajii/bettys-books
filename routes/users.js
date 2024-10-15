@@ -15,7 +15,7 @@ const redirectLogin = (req, res, next) => {
 router.get('/logout', redirectLogin, (req,res) => {
     req.session.destroy(err => {
     if (err) {
-      return res.redirect('/home')
+      return res.redirect('/usr/777/home')
     }
     res.send('you are now logged out. <a href='+'/home'+'>Home</a>');
     })
@@ -110,7 +110,7 @@ router.post('/loggedin', function (req, res, next) {
 
         req.flash('success', 'Login successful! Welcome, ' + username + '!')
 
-        return res.redirect('/home');
+        return res.redirect('/usr/777/home');
 
 
 
