@@ -2,8 +2,12 @@
 var express = require ('express')
 var ejs = require('ejs')
 
+var session = require ('express-session')
+
 //Import mysql module
 var mysql = require('mysql2')
+
+var flash = require('connect-flash');
 
 
 // Create the express application object
@@ -18,6 +22,23 @@ app.use(express.urlencoded({ extended: true }))
 
 // Set up public folder (for css and statis js)
 app.use(express.static(__dirname + '/public'))
+
+// Create a session
+app.use(session({
+    secret: 'somerandomstuff',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        expires: 600000
+    }
+}))
+
+app.use(flash());
+
+app.use(function(req, res, next) {
+    res.locals.successMessage = req.flash('success');
+    next();
+});
 
 // Define the database connection
 const db = mysql.createConnection ({

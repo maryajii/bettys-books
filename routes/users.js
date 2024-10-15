@@ -4,6 +4,23 @@ const router = express.Router()
 const bcrypt = require('bcrypt')
 const saltRounds = 10
 
+const redirectLogin = (req, res, next) => {
+    if (!req.session.userId ) {
+      res.redirect('/users/login') // redirect to the login page
+    } else { 
+        next (); // move to the next middleware function
+    } 
+}
+
+router.get('/logout', redirectLogin, (req,res) => {
+    req.session.destroy(err => {
+    if (err) {
+      return res.redirect('/')
+    }
+    res.send('you are now logged out. <a href='+'/'+'>Home</a>');
+    })
+})
+
 router.get('/register', function (req, res, next) {
     res.render('register.ejs')                                                               
 })    
@@ -55,6 +72,10 @@ router.post('/registered', function (req, res, next) {
 router.post('/loggedin', function (req, res, next) {
     const username = req.body.username; // Get the username from the request
     const plainPassword = req.body.password; // Get the password from the request
+    
+    // Save user session here, when login is successful
+    req.session.userId = req.body.username;
+
 
     // SQL query to find the user by username
     let sqlquery = `SELECT * FROM users WHERE username = ?`;
@@ -81,7 +102,18 @@ router.post('/loggedin', function (req, res, next) {
         }
         else if (result == true) {
           // TODO: Send message
-          return res.send('Login successful! Welcome, ' + username + '!');
+
+          // Save user session here, when login is successful
+          req.session.userId = req.body.username;
+          
+        //   return res.send('Login successful! Welcome, ' + username + '!');
+
+        req.flash('success', 'Login successful! Welcome, ' + username + '!')
+
+        return res.redirect('/');
+
+
+
         }
         else {
           // TODO: Send message
@@ -91,7 +123,7 @@ router.post('/loggedin', function (req, res, next) {
     })     
 })
 
-router.get('/listusers', function(req, res, next) {
+router.get('/listusers', redirectLogin, function(req, res, next) {
     let sqlquery = "SELECT * FROM users" // query database to get all the users
     // execute sql query
     db.query(sqlquery, (err, result) => {
