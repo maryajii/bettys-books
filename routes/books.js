@@ -14,6 +14,7 @@ router.get('/search',function(req, res, next){
 })
 
 router.get('/search_result', function (req, res, next) {
+    const searchText = req.sanitize(req.query.search_text); 
     // Search the database
     let sqlquery = "SELECT * FROM books WHERE name LIKE '%" + req.query.search_text + "%'" // query database to get all the books
     // execute sql query
@@ -42,6 +43,9 @@ router.get('/addbook', redirectLogin, function (req, res, next) {
 })
 
 router.post('/bookadded', redirectLogin, function (req, res, next) {
+   
+    req.body.title = req.sanitize(req.body.title);
+
     // saving data in database
     let sqlquery = "INSERT INTO books (name, price) VALUES (?,?)"
     // execute sql query

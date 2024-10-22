@@ -3,6 +3,7 @@ var express = require ('express')
 var ejs = require('ejs')
 
 var session = require ('express-session')
+var validator = require ('express-validator');
 
 //Import mysql module
 var mysql = require('mysql2')
@@ -14,6 +15,8 @@ var flash = require('connect-flash');
 const app = express()
 const port = 8000
 
+const expressSanitizer = require('express-sanitizer');
+
 // Tell Express that we want to use EJS as the templating engine
 app.set('view engine', 'ejs')
 
@@ -22,6 +25,8 @@ app.use(express.urlencoded({ extended: true }))
 
 // Set up public folder (for css and statis js)
 app.use(express.static(__dirname + '/public'))
+
+app.use(expressSanitizer());
 
 // Create a session
 app.use(session({

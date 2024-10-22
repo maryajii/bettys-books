@@ -4,6 +4,8 @@ const router = express.Router()
 const bcrypt = require('bcrypt')
 const saltRounds = 10
 
+const { check, validationResult } = require('express-validator');
+
 const redirectLogin = (req, res, next) => {
     if (!req.session.userId ) {
       res.redirect('/users/login') // redirect to the login page
@@ -15,7 +17,7 @@ const redirectLogin = (req, res, next) => {
 router.get('/logout', redirectLogin, (req,res) => {
     req.session.destroy(err => {
     if (err) {
-      return res.redirect('/usr/777/home')
+      return res.redirect('/home')
     }
     res.send('you are now logged out. <a href='+'/home'+'>Home</a>');
     })
@@ -26,10 +28,25 @@ router.get('/register', function (req, res, next) {
 })    
 
 router.get('/login', function (req, res, next) {
-    res.render('login.ejs')                                                               
-})    
 
-router.post('/registered', function (req, res, next) {
+    req.body.username = req.sanitize(req.body.username);
+
+    res.render('login.ejs')
+})
+
+router.post('/registered', [
+    check('email').isEmail(), 
+    check('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+], function (req, res, next) {
+    req.body.first = req.sanitize(req.body.first);
+    req.body.last = req.sanitize(req.body.last);
+    req.body.username = req.sanitize(req.body.username);
+    req.body.email = req.sanitize(req.body.email); 
+
+    const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.redirect('./register', { errors: errors.array() }); }
+else {
     // saving data in database
     const plainPassword = req.body.password
 
@@ -67,6 +84,7 @@ router.post('/registered', function (req, res, next) {
             res.send(result)
         })
     })
+}
 }) 
 
 router.post('/loggedin', function (req, res, next) {
@@ -110,7 +128,7 @@ router.post('/loggedin', function (req, res, next) {
 
         req.flash('success', 'Login successful! Welcome, ' + username + '!')
 
-        return res.redirect('/usr/777/home');
+        return res.redirect('/home');
 
 
 
